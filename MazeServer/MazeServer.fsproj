@@ -62,6 +62,9 @@
     <Compile Include="App.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
+    <Content Include="maze.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">

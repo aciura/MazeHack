@@ -31,18 +31,22 @@ let getResourceFromReq<'a> (req : HttpRequest) =
     printfn "%A" obj
     obj
 
+//game has to be mutable as it requires path to maze file from startup args
+let mutable game = Game "maze.txt"
+
 let movePlayer direction teamId = 
     printfn "MovePlayer dir=%s teamId=%s" direction teamId
-    Game.Move direction
+    game.Move direction
 
 let Greeting (requestBody:Team) = {greeting = sprintf "Hi %s!" requestBody.teamId}
-let ReturnStartEndPoints (teamAndMaze:TeamAndMaze) =  Game.StartAndEndPoint
+let ReturnStartEndPoints (teamAndMaze:TeamAndMaze) = game.StartAndEnd
+let ScanAround (teamAndMaze) = game.ScanAround()
 
 let app : WebPart = 
     choose [ 
         GET >=> choose [ 
             path "/HealthCheck" >=> warbler (fun _ -> {currentTime=System.DateTime.Now} |> JSON)
-            //path "/Maze" >=> warbler (fun _ -> OK (Game.Maze.ToHTML))            
+            path "/Maze" >=> warbler (fun _ -> OK (game.MazeToHtml))            
         ]
         POST >=> choose [ 
             path "/StartCompetition" >=> request (getResourceFromReq >> ReturnStartEndPoints >> JSON)
@@ -53,13 +57,15 @@ let app : WebPart =
                     |> movePlayer dir 
                     |> JSON))
 
-            path "/GreatTeam" >=> request (getResourceFromReq<Team> >> Greeting >> JSON)             
-        ]
-    ]
+            path "/GreatTeam" >=> request (getResourceFromReq<Team> >> Greeting >> JSON)
+            path "/Scan" >=> request (getResourceFromReq<TeamAndMaze> >> ScanAround >> JSON)
+        ]        
+    ]    
 
 [<EntryPoint>]
 let main argv = 
-    printfn "Starting up server %s" (System.DateTime.Now.ToString())
-    Game.Init argv 
+    printfn "Starting up server. Args:%A" argv
+    let mazeFilepath = if argv.Length > 0 then argv.[0] else "maze.txt"
+    game <- Game mazeFilepath
     startWebServer defaultConfig app
     0 

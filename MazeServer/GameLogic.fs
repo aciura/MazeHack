@@ -9,6 +9,8 @@ type Direction =
     | Left
     | Right
 
+type ScanResult = { left:string; up:string; right:string; down:string }
+
 type GameLogic (maze:Maze) = 
     let IsEmptyCell cell = 
         match cell with 
@@ -51,3 +53,13 @@ type GameLogic (maze:Maze) =
             | Left  -> {x=player.Position.x - 1; y=player.Position.y}
             | Right -> {x=player.Position.x + 1; y=player.Position.y}
         player |> this.MoveTo newPos
+
+    member this.ScanAround (player:Player) = 
+        printfn "ScanAround %A" (player.ToString())
+        let x,y = player.Position.x, player.Position.y
+        let symbolForCell point = point |> maze.GetCell |> Maze.Cell2Symbol
+        { left  = symbolForCell {x=x-1;y=y}; 
+          up    = symbolForCell {x=x;y=y-1}; 
+          right = symbolForCell {x=x+1;y=y}; 
+          down  = symbolForCell {x=x;y=y+1}}
+        

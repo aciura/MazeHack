@@ -28,18 +28,21 @@ type Maze(desc:string) =
         
     let Mazify (desc : string) =
         let lines = desc.Replace('\r',' ').Split('\n') 
-        printfn "%A" lines
+        //printfn "%A" lines
         let lineToCellArr (line:string) = 
             line.ToCharArray() |> Array.map char2Cell
         lines |> Array.map lineToCellArr 
 
+    //array2d : Cell [] []
     let array2d = Mazify desc
-    let array2d' = Array2D.zeroCreate array2d.[0].Length array2d.Length
     
-    let _ = Array.iteri (fun j arr -> 
-                            Array.iteri (fun i cell -> 
-                                            array2d'.[i,j] <- cell ) arr ) array2d
-
+    //array2d' : Cell [,] - real array2d representation 
+    //  it's not so useful as there are not many Array2d.* functions implemented
+    //  there are just: Array2D.map, Array2D.iter
+    let array2d' = Array2D.zeroCreate array2d.[0].Length array2d.Length
+    let _ = array2d |> Array.iteri (fun j arr -> 
+                              arr |> Array.iteri (fun i cell -> array2d'.[i,j] <- cell ) )          
+    
     let findSpecificCell searchedFor = 
         let point = 
             array2d |> Array.fold (fun (i,j) arr -> 
@@ -76,7 +79,4 @@ type Maze(desc:string) =
         let printCellRow i cellRow = 
             changeCellRowToSymbols cellRow |> printfn "%i: %A" i 
         array2d |> Array.iteri printCellRow 
-
-    
-
 

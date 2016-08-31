@@ -9,25 +9,31 @@ open Player
 type MoveResult = { position:Point; details:string; outcome:string; }
 type StartEndPoint = { startPoint:Point; endPoint:Point }
 
-let maze = File.ReadAllText(@"maze.txt") |> Maze 
+type Game (mapFilepath : string) = 
+    
+    let maze = File.ReadAllText(mapFilepath) |> Maze 
+    
+    let gameLogic = maze |> GameLogic 
+    
+    let start = maze.Start
+    
+    let mutable player = Player("X", start, Success, maze.GetCell start)
 
-printfn "%A" (maze.Print())
-printfn "Start = %A" (maze.Start)
-printfn "End = %A" (maze.End)
+    member this.DebugPrintMaze = 
+        printfn "%A" (maze.Print())
+        printfn "Start = (%d,%d)" maze.Start.x maze.Start.y
+        printfn "End = (%d,%d)" maze.End.x maze.End.y
+            
+    member this.Move direction = 
+        player <- gameLogic.Move direction player
+        { position=player.Position; 
+          details=  player.Target |> Maze.Cell2Symbol; 
+          outcome= player.Result |> function 
+                | Success -> "success" 
+                | _ -> "failure" }
 
-let gameLogic = maze |> GameLogic 
+    member this.ScanAround() = gameLogic.ScanAround player
 
-let start = maze.Start
-let mutable player = Player("X", start, Success, maze.GetCell start)
+    member this.StartAndEnd = { startPoint = maze.Start; endPoint = maze.End }
 
-let Init argv = None //TODO    
-
-let Move direction = 
-    player <- gameLogic.Move direction player
-    { position=player.Position; 
-      details=  player.Target |> Maze.Cell2Symbol; 
-      outcome= player.Result |> function 
-            | Success -> "success" 
-            | _ -> "failure" }
-
-let StartAndEndPoint = { startPoint = maze.Start; endPoint = maze.End }
+    member this.MazeToHtml = maze.ToHTML
