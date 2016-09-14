@@ -58,6 +58,7 @@ let app : WebPart =
                     |> JSON))
 
             path "/GreatTeam" >=> request (getResourceFromReq<Team> >> Greeting >> JSON)
+
             path "/Scan" >=> request (getResourceFromReq<TeamAndMaze> >> ScanAround >> JSON)
         ]        
     ]    

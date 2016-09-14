@@ -21,10 +21,10 @@ type GameLogic (maze:Maze) =
         
     let mapStrToDir str = 
         match str with 
-        | "Up" -> Up
-        | "Down" -> Down
-        | "Left" -> Left
-        | "Right"-> Right
+        | "Up" | "up" | "UP" -> Up
+        | "Down" | "DOWN" | "down" -> Down
+        | "Left" | "LEFT" | "left" -> Left
+        | "Right" | "RIGHT" | "right" -> Right
         | _ -> failwith (sprintf "Unknown direction: %s" str)
 
     member this.Maze = maze
