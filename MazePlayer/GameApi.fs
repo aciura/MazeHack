@@ -1,17 +1,20 @@
 ﻿module GameApi
 
 open FSharp.Data
+open Maze
 
 let serverUrl = "http://localhost:8083"
 
-type ScanResult = JsonProvider<"""{
+type ScanResultJson = JsonProvider<"""{
                                   "left": "#",
                                   "up": "#",
                                   "right": " ",
                                   "down": "#"
                                 }""">
 
-type MoveResult = JsonProvider<"""{
+type ScanResult = {up:Cell; down:Cell; right:Cell; left:Cell}
+
+type MoveResultJson = JsonProvider<"""{
                                   "position": {
                                         "x": 3,
                                         "y": 1
@@ -20,7 +23,7 @@ type MoveResult = JsonProvider<"""{
                                   "outcome": "success"
                                 }""">
 
-type StartCompetionResult = JsonProvider<"""{
+type StartCompetionResultJson = JsonProvider<"""{
                                                 "startPoint": {
                                                 "x": 2,
                                                 "y": 1
@@ -31,23 +34,28 @@ type StartCompetionResult = JsonProvider<"""{
                                                 }
                                             }""">
 
-type GreatTeamResult = JsonProvider<"""{ "greeting": "Hi teamABC!" }""">
+type GreatTeamResultJson = JsonProvider<"""{ "greeting": "Hi teamABC!" }""">
 
 
 let sendPostRequest urlExt = 
+    printfn "%s[Sending: %s]" System.Environment.NewLine urlExt
     Http.RequestString ( 
             url = sprintf "%s%s" serverUrl urlExt, 
             headers = [HttpRequestHeaders.ContentType HttpContentTypes.Json],
             body = TextRequest """ {"teamId":'MazePlayer', 'mazeId':'mazeXXX'} """ )
 
-let scanAround() = 
-    sendPostRequest "/Scan" |> ScanResult.Parse
+let scanAround() : ScanResult = 
+    sendPostRequest "/Scan" |> ScanResultJson.Parse 
+    |> fun scan -> { up=Maze.Str2Cell scan.Up; 
+                    down=Maze.Str2Cell scan.Down; 
+                    left=Maze.Str2Cell scan.Left; 
+                    right=Maze.Str2Cell scan.Right } 
 
 let move dir = 
-    sendPostRequest (sprintf "%s%s" "/Move" dir) |> MoveResult.Parse
+    sendPostRequest (sprintf "%s%s" "/Move" dir) |> MoveResultJson.Parse
 
 let startCompetition() = 
-    sendPostRequest "/StartCompetition" |> StartCompetionResult.Parse
+    sendPostRequest "/StartCompetition" |> StartCompetionResultJson.Parse
 
 let greatTeam() = 
-    sendPostRequest "/GreatTeam" |> GreatTeamResult.Parse
+    sendPostRequest "/GreatTeam" |> GreatTeamResultJson.Parse

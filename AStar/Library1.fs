@@ -1,38 +1,38 @@
-﻿module AStar
-
-open System.Collections.Generic
-
-type Weight =
-  | Blocked
-  | Weight of weight:int
-
-type Node =
-  {
-    x : int
-    y : int
-    weight : Weight
-  }
-
-let Directions =
-  [
-    { x =  1; y =  0; weight = Blocked }
-    { x =  0; y = -1; weight = Blocked }
-    { x = -1; y =  0; weight = Blocked }
-    { x =  0; y =  1; weight = Blocked }
-  ]
-
-type Graph =
-    {
-        nodes : Dictionary<(int * int), Node>
-        cameFrom : Dictionary<Node, Node>
-        costSoFar : Dictionary<Node, int>
-        path : Node list        
-    }
-    with 
-    member this.neighbors_of (node:Node) = 
-            Directions |> 
-            List.map (fun dir -> this.nodes.TryGetValue(node.x + dir.x, node.y + dir.y))
-
+﻿//module AStar
+//
+//open System.Collections.Generic
+//
+//type Weight =
+//  | Blocked
+//  | Weight of weight:int
+//
+//type Node =
+//  {
+//    x : int
+//    y : int
+//    weight : Weight
+//  }
+//
+//let Directions =
+//  [
+//    { x =  1; y =  0; weight = Blocked }
+//    { x =  0; y = -1; weight = Blocked }
+//    { x = -1; y =  0; weight = Blocked }
+//    { x =  0; y =  1; weight = Blocked }
+//  ]
+//
+//type Graph =
+//    {
+//        nodes : Dictionary<(int * int), Node>
+//        cameFrom : Dictionary<Node, Node>
+//        costSoFar : Dictionary<Node, int>
+//        path : Node list        
+//    }
+//    with 
+//    member this.neighbors_of (node:Node) = 
+//            Directions |> 
+//            List.map (fun dir -> this.nodes.TryGetValue(node.x + dir.x, node.y + dir.y))
+//
 //let reconstruct_path (cameFrom:Dictionary<Node,Node>) (current:Node) =
 //    let mutable total_path = [current]
 //    let mutable node = current
